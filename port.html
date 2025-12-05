@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahanaf Mokammel | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            color: #ffffff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Three.js Canvas Background */
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: black;
+        }
+
+        /* Content Layer */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Quick Loading Screen */
+        .intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .intro-logo {
+            width: 300px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .intro-logo img {
+            width: 100%;
+            opacity: 0;
+            animation: logo 3s ease-out forwards;
+        }
+
+        @keyframes logo {
+            0% { transform: scale(2); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        /* Header */
+        .main-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 232, 31, 0.3);
+            box-shadow: 0 0 30px rgba(255, 232, 31, 0.2);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffe81f;
+            text-decoration: none;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            padding: 10px 20px;
+            position: relative;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            text-shadow: 0 0 20px rgba(255, 232, 31, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: #ffe81f;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        /* Typing Cursor */
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background-color: #ffe81f;
+            margin-left: 2px;
+            animation: blink 0.7s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 100px;
+            position: relative;
+        }
+
+        .home-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        /* Profile Picture */
+        .profile-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .profile-pic {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 3px solid #ffe81f;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 
+                0 0 30px rgba(255, 232, 31, 0.5),
+                inset 0 0 20px rgba(255, 232, 31, 0.2);
+            object-fit: cover;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .profile-glow {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(255, 232, 31, 0.3) 0%,
+                rgba(255, 232, 31, 0.1) 40%,
+                transparent 70%);
+            z-index: -1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Main Title - Enhanced */
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            color: #ffe81f;
+            margin-bottom: 10px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.3),
+                0 0 30px rgba(255, 232, 31, 0.2);
+            position: relative;
+        }
+
+        .main-title::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle,
+                rgba(255, 232, 31, 0.1) 0%,
+                transparent 70%);
+            filter: blur(30px);
+            z-index: -1;
+        }
+
+        .title-sub {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #ffe81f;
+            margin: 20px 0 40px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.3);
+        }
+
+        /* Social Icons */
+        .social-icons {
+            display: flex;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 232, 31, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffe81f;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(255, 232, 31, 0.2);
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(255, 232, 31, 0.1);
+            border-color: rgba(255, 232, 31, 0.8);
+            box-shadow: 0 0 25px rgba(255, 232, 31, 0.4);
+        }
+
+        /* About Section */
+        .about-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.8rem;
+            color: #ffe81f;
+            margin-bottom: 60px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.3);
+        }
+
+        .info-box-container {
+            width: 90%;
+            max-width: 1400px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+        }
+
+        /* Enhanced Cards */
+        .info-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 232, 31, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(255, 232, 31, 0.1),
+                0 0 40px rgba(255, 232, 31, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            min-height: 400px;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 232, 31, 0.1),
+                transparent);
+            transition: left 0.6s ease;
+        }
+
+        .info-card:hover::before {
+            left: 100%;
+        }
+
+        .info-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.8),
+                inset 0 0 0 1px rgba(255, 232, 31, 0.2),
+                0 0 80px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Card Images */
+        .card-image {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: rgba(255, 232, 31, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 232, 31, 0.3);
+            box-shadow: 0 0 20px rgba(255, 232, 31, 0.2);
+        }
+
+        .card-image i {
+            font-size: 2.5rem;
+            color: #ffe81f;
+        }
+
+        /* Card Title - Enhanced */
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #ffe81f;
+            margin-bottom: 25px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Info Items - Enhanced */
+        .info-list {
+            list-style: none;
+        }
+
+        .info-item {
+            margin-bottom: 18px;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1.1rem;
+            color: #ffffff;
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+            letter-spacing: 0.8px;
+            line-height: 1.6;
+        }
+
+        .info-item::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #ffe81f;
+            font-size: 1rem;
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.5);
+        }
+
+        /* Company Link - Enhanced */
+        .info-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 12px 30px;
+            border: 1px solid rgba(255, 232, 31, 0.4);
+            border-radius: 8px;
+            color: #ffe81f;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.7);
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.5);
+        }
+
+        .info-link i {
+            font-size: 1.2rem;
+        }
+
+        .info-link:hover {
+            background: rgba(255, 232, 31, 0.15);
+            border-color: rgba(255, 232, 31, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(255, 232, 31, 0.3),
+                0 0 20px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        /* Contact Cards - Enhanced */
+        .contact-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 232, 31, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 1px rgba(255, 232, 31, 0.1),
+                0 0 40px rgba(255, 232, 31, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 232, 31, 0.1),
+                transparent);
+            transition: left 0.6s ease;
+        }
+
+        .contact-card:hover::before {
+            left: 100%;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.8),
+                inset 0 0 0 1px rgba(255, 232, 31, 0.2),
+                0 0 80px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Contact Icon */
+        .contact-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 232, 31, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255, 232, 31, 0.3);
+            box-shadow: 0 0 30px rgba(255, 232, 31, 0.2);
+            font-size: 3rem;
+            color: #ffe81f;
+        }
+
+        /* Contact Title - Enhanced */
+        .contact-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #ffe81f;
+            margin-bottom: 20px;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Contact Description - Enhanced */
+        .contact-desc {
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 0.8px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        /* Contact Links - Enhanced */
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 35px;
+            border: 1px solid rgba(255, 232, 31, 0.4);
+            border-radius: 8px;
+            color: #ffe81f;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.7);
+            text-shadow: 0 0 10px rgba(255, 232, 31, 0.5);
+        }
+
+        .contact-link i {
+            font-size: 1.2rem;
+        }
+
+        .contact-link:hover {
+            background: rgba(255, 232, 31, 0.15);
+            border-color: rgba(255, 232, 31, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(255, 232, 31, 0.3),
+                0 0 20px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Skills Section */
+        .skills-section {
+            padding: 80px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 232, 31, 0.1);
+            border-bottom: 1px solid rgba(255, 232, 31, 0.1);
+        }
+
+        .skills-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .skill-item {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 232, 31, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 232, 31, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 232, 31, 0.1);
+            border-color: rgba(255, 232, 31, 0.3);
+            box-shadow: 0 10px 25px rgba(255, 232, 31, 0.2);
+        }
+
+        .skill-icon {
+            font-size: 3rem;
+            color: #ffe81f;
+            margin-bottom: 20px;
+        }
+
+        .skill-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: #ffe81f;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        .main-footer {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid rgba(255, 232, 31, 0.2);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .footer-quote {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #ffe81f;
+            margin-top: 40px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 
+                0 0 10px rgba(255, 232, 31, 0.5),
+                0 0 20px rgba(255, 232, 31, 0.3),
+                0 0 30px rgba(255, 232, 31, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .title-sub { font-size: 1.3rem; }
+            .section-title { font-size: 2rem; }
+            .nav-links { flex-direction: column; gap: 15px; }
+            .profile-pic { width: 200px; height: 200px; }
+            .info-box-container,
+            .contact-grid,
+            .skills-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile-pic { width: 150px; height: 150px; }
+            .main-title { font-size: 2rem; }
+            .section-title { font-size: 1.8rem; }
+            .info-card,
+            .contact-card {
+                padding: 25px;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Three.js Canvas for Galaxy Background -->
+    <canvas id="canvas"></canvas>
+    
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Quick Loading Screen -->
+        <div class="intro-container" id="intro">
+            <div class="intro-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Star_Wars_Logo.svg" alt="Logo">
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="main-header" style="display: none;" id="mainHeader">
+            <nav class="nav-links">
+                <a href="#home" class="nav-link" id="navHome"></a>
+                <a href="#about" class="nav-link" id="navAbout"></a>
+                <a href="#contact" class="nav-link" id="navContact"></a>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Home -->
+            <section id="home" class="home-section">
+                <div class="profile-container">
+                    <div class="profile-glow"></div>
+                    <img src="cover_bg_2.jpg" 
+                         alt="Ahanaf Mokammel" class="profile-pic" id="profilePicture">
+                </div>
+                <h1 class="main-title" id="mainTitle"></h1>
+                <p class="title-sub" id="titleSub"></p>
+                
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/" target="_blank" class="social-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://github.com/" target="_blank" class="social-icon">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://twitter.com/" target="_blank" class="social-icon">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="mailto:ahanaf@example.com" class="social-icon">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- About -->
+            <section id="about" class="about-section">
+                <h2 class="section-title" id="aboutTitle"></h2>
+                <div class="info-box-container">
+                    <div class="info-card">
+                        <div class="card-image">
+                            <i class="fas fa-user-astronaut"></i>
+                        </div>
+                        <h3 class="card-title" id="profileTitle"></h3>
+                        <ul class="info-list">
+                            <li class="info-item" id="profileItem1"></li>
+                            <li class="info-item" id="profileItem2"></li>
+                            <li class="info-item" id="profileItem3"></li>
+                            <li class="info-item" id="profileItem4"></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="card-image">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h3 class="card-title" id="experienceTitle"></h3>
+                        <ul class="info-list">
+                            <li class="info-item" id="expItem1"></li>
+                            <li class="info-item" id="expItem2"></li>
+                            <li class="info-item" id="expItem3"></li>
+                            <li class="info-item" id="expItem4"></li>
+                            <li class="info-item" id="expItem5"></li>
+                        </ul>
+                        <a href="https://www.billingmastersoftware.com/" target="_blank" class="info-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span id="companyLink"></span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills -->
+            <section class="skills-section">
+                <h2 class="section-title">TECHNICAL SKILLS</h2>
+                <div class="skills-container">
+                    <div class="skill-item">
+                        <div class="skill-icon">
+                            <i class="fab fa-js-square"></i>
+                        </div>
+                        <h3 class="skill-name">JavaScript</h3>
+                        <p>React, Node.js, TypeScript</p>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <h3 class="skill-name">Python</h3>
+                        <p>Django, Flask, Data Science</p>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 class="skill-name">Databases</h3>
+                        <p>MongoDB, PostgreSQL, MySQL</p>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                        <h3 class="skill-name">Cloud & DevOps</h3>
+                        <p>AWS, Docker, CI/CD</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact -->
+            <section id="contact" class="contact-section">
+                <h2 class="section-title" id="contactTitle"></h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <h3 class="contact-title" id="facebookTitle"></h3>
+                        <p class="contact-desc" id="facebookDesc"></p>
+                        <a href="https://www.facebook.com/bigXsmoke/" target="_blank" class="contact-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span id="facebookLink"></span>
+                        </a>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <h3 class="contact-title" id="instagramTitle"></h3>
+                        <p class="contact-desc" id="instagramDesc"></p>
+                        <a href="https://www.instagram.com/bigsmoke________/" target="_blank" class="contact-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span id="instagramLink"></span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="main-footer">
+                <p id="footerText"></p>
+                <div class="footer-quote" id="footerQuote"></div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Simplified Three.js Galaxy Background
+        let scene, camera, renderer, galaxy, universe;
+        let galaxyMaterial, universeMaterial;
+        
+        function initGalaxy() {
+            // Scene
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 2, 3);
+            
+            // Renderer
+            const canvas = document.getElementById('canvas');
+            renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            
+            // Create star texture
+            const canvas2d = document.createElement('canvas');
+            const ctx = canvas2d.getContext('2d');
+            canvas2d.width = canvas2d.height = 32;
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, 32, 32);
+            
+            let grd = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grd.addColorStop(0.0, '#fff');
+            grd.addColorStop(1.0, '#000');
+            ctx.fillStyle = grd;
+            ctx.beginPath(); ctx.rect(15, 0, 2, 32); ctx.fill();
+            ctx.beginPath(); ctx.rect(0, 15, 32, 2); ctx.fill();
+            
+            grd = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+            grd.addColorStop(0.1, '#ffff');
+            grd.addColorStop(0.6, '#0000');
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, 32, 32);
+            
+            const alphaMap = new THREE.CanvasTexture(canvas2d);
+            
+            // Galaxy particles
+            const galaxyCount = 10000;
+            const galaxyGeometry = new THREE.BufferGeometry();
+            const galaxyPositions = new Float32Array(galaxyCount * 3);
+            const galaxyColors = new Float32Array(galaxyCount * 3);
+            
+            const innerColor = new THREE.Color('#ff4400');
+            const outerColor = new THREE.Color('#a7f');
+            
+            for (let i = 0; i < galaxyCount; i++) {
+                // Spiral galaxy shape
+                const radius = Math.random() * 5;
+                const angle = radius * 5;
+                const spiralRadius = radius * (0.5 + Math.random() * 0.5);
+                
+                const x = Math.cos(angle) * spiralRadius;
+                const z = Math.sin(angle) * spiralRadius;
+                const y = (Math.random() - 0.5) * radius * 0.3;
+                
+                galaxyPositions[i * 3] = x;
+                galaxyPositions[i * 3 + 1] = y;
+                galaxyPositions[i * 3 + 2] = z;
+                
+                // Color gradient from center to edge
+                const color = innerColor.clone().lerp(outerColor, radius / 5);
+                galaxyColors[i * 3] = color.r;
+                galaxyColors[i * 3 + 1] = color.g;
+                galaxyColors[i * 3 + 2] = color.b;
+            }
+            
+            galaxyGeometry.setAttribute('position', new THREE.BufferAttribute(galaxyPositions, 3));
+            galaxyGeometry.setAttribute('color', new THREE.BufferAttribute(galaxyColors, 3));
+            
+            galaxyMaterial = new THREE.PointsMaterial({
+                size: 0.05,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.7,
+                map: alphaMap,
+                blending: THREE.AdditiveBlending,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            galaxy = new THREE.Points(galaxyGeometry, galaxyMaterial);
+            scene.add(galaxy);
+            
+            // Background stars
+            const universeCount = 5000;
+            const universeGeometry = new THREE.BufferGeometry();
+            const universePositions = new Float32Array(universeCount * 3);
+            
+            for (let i = 0; i < universeCount; i++) {
+                // Random positions in a sphere
+                const radius = 10 + Math.random() * 20;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                universePositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                universePositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                universePositions[i * 3 + 2] = radius * Math.cos(phi);
+            }
+            
+            universeGeometry.setAttribute('position', new THREE.BufferAttribute(universePositions, 3));
+            
+            universeMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.5,
+                map: alphaMap,
+                blending: THREE.AdditiveBlending,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            universe = new THREE.Points(universeGeometry, universeMaterial);
+            scene.add(universe);
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Rotate galaxy
+                galaxy.rotation.y += 0.001;
+                galaxy.rotation.x += 0.0005;
+                
+                // Rotate background stars slower
+                universe.rotation.y += 0.0003;
+                universe.rotation.x += 0.0002;
+                
+                // Pulsing effect
+                const time = Date.now() * 0.001;
+                galaxyMaterial.opacity = 0.6 + Math.sin(time * 0.5) * 0.1;
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', onWindowResize);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Initialize galaxy when page loads
+        window.addEventListener('load', initGalaxy);
+    </script>
+
+    <script>
+        // Text content
+        const textContent = {
+            navHome: "HOME",
+            navAbout: "ABOUT",
+            navContact: "CONTACT",
+            mainTitle: "AHANAF MOKAMMEL",
+            titleSub: "SOFTWARE DEVELOPER",
+            aboutTitle: "ABOUT",
+            profileTitle: "PROFESSIONAL PROFILE",
+            profileItems: [
+                "AHANAF MOKAMMEL",
+                "Bachelor of Science in Computer Science",
+                "BRAC University (2021-2025)",
+                "Dhaka Residential Model College (2018-2020)"
+            ],
+            experienceTitle: "PROFESSIONAL EXPERIENCE",
+            experienceItems: [
+                "Software Developer at Billing Master Software Ltd.",
+                "Position: Web Developer",
+                "Full Stack Development",
+                "Frontend & Backend Solutions",
+                "Software Engineering & Architecture"
+            ],
+            companyLink: "VISIT COMPANY WEBSITE",
+            contactTitle: "CONTACT",
+            facebookTitle: "FACEBOOK",
+            facebookDesc: "Connect with me on Facebook",
+            facebookLink: "CONNECT ON FACEBOOK",
+            instagramTitle: "INSTAGRAM",
+            instagramDesc: "Follow me on Instagram",
+            instagramLink: "FOLLOW ON INSTAGRAM",
+            footerText: "MAY THE CODE BE WITH YOU",
+            footerQuote: "\"GREAT SOFTWARE IS BUILT BY GREAT DEVELOPERS\""
+        };
+
+        // Typing function
+        function typeText(elementId, text, speed, callback) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                if (callback) callback();
+                return;
+            }
+            
+            element.innerHTML = '';
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    element.innerHTML = text;
+                    if (callback) {
+                        setTimeout(callback, 300);
+                    }
+                }
+            }
+            
+            type();
+        }
+
+        // Simple sequential typing
+        function startTyping() {
+            // Start with navigation
+            typeText('navHome', textContent.navHome, 80, function() {
+                typeText('navAbout', textContent.navAbout, 80, function() {
+                    typeText('navContact', textContent.navContact, 80, function() {
+                        // Then main title
+                        typeText('mainTitle', textContent.mainTitle, 100, function() {
+                            // Then subtitle
+                            typeText('titleSub', textContent.titleSub, 70, function() {
+                                // Show about section
+                                document.getElementById('about').style.display = 'flex';
+                                typeText('aboutTitle', textContent.aboutTitle, 70, function() {
+                                    // Profile card
+                                    typeText('profileTitle', textContent.profileTitle, 60, function() {
+                                        // Profile items
+                                        typeText('profileItem1', textContent.profileItems[0], 40, function() {
+                                            typeText('profileItem2', textContent.profileItems[1], 40, function() {
+                                                typeText('profileItem3', textContent.profileItems[2], 40, function() {
+                                                    typeText('profileItem4', textContent.profileItems[3], 40, function() {
+                                                        // Experience card
+                                                        typeText('experienceTitle', textContent.experienceTitle, 60, function() {
+                                                            typeText('expItem1', textContent.experienceItems[0], 40, function() {
+                                                                typeText('expItem2', textContent.experienceItems[1], 40, function() {
+                                                                    typeText('expItem3', textContent.experienceItems[2], 40, function() {
+                                                                        typeText('expItem4', textContent.experienceItems[3], 40, function() {
+                                                                            typeText('expItem5', textContent.experienceItems[4], 40, function() {
+                                                                                typeText('companyLink', textContent.companyLink, 50, function() {
+                                                                                    // Contact section
+                                                                                    document.getElementById('contact').style.display = 'flex';
+                                                                                    typeText('contactTitle', textContent.contactTitle, 70, function() {
+                                                                                        // Facebook
+                                                                                        typeText('facebookTitle', textContent.facebookTitle, 60, function() {
+                                                                                            typeText('facebookDesc', textContent.facebookDesc, 40, function() {
+                                                                                                typeText('facebookLink', textContent.facebookLink, 50, function() {
+                                                                                                    // Instagram
+                                                                                                    typeText('instagramTitle', textContent.instagramTitle, 60, function() {
+                                                                                                        typeText('instagramDesc', textContent.instagramDesc, 40, function() {
+                                                                                                            typeText('instagramLink', textContent.instagramLink, 50, function() {
+                                                                                                                // Footer
+                                                                                                                typeText('footerText', textContent.footerText, 70, function() {
+                                                                                                                    typeText('footerQuote', textContent.footerQuote, 70, function() {
+                                                                                                                        console.log('All typing complete!');
+                                                                                                                    });
+                                                                                                                });
+                                                                                                            });
+                                                                                                        });
+                                                                                                    });
+                                                                                                });
+                                                                                            });
+                                                                                        });
+                                                                                    });
+                                                                                });
+                                                                            });
+                                                                        });
+                                                                    });
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        }
+
+        // Quick intro (2 seconds instead of 10)
+        setTimeout(function() {
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('mainHeader').style.display = 'flex';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            // Start typing immediately
+            startTyping();
+        }, 2000);
+
+        // Simple navigation scroll
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                window.scrollTo({
+                    top: targetSection.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Function to update profile picture (you can replace the URL with your actual photo)
+        function updateProfilePicture() {
+            // You can replace this URL with your actual profile picture
+            const profilePic = document.getElementById('profilePicture');
+            // profilePic.src = "your-profile-picture-url.jpg";
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', updateProfilePicture);
+    </script>
+</body>
+</html>
